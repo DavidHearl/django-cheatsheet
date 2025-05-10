@@ -9,133 +9,136 @@
 <body>
     <div class="container">
         <h1>Django Setup & Deployment Guide</h1>
-
+    
         <h2>1. Create the Django Project</h2>
         <ol>
             <li>Open VS Code and open the terminal (View > Terminal).</li>
+
             <li>Navigate to your desired directory:
                 <ul>
-                    <li>
-                        <p class="description">Mac:</p>
-                        <pre><code>cd '/Users/davidhearl/Documents/08 - Programming/GitHub'</code></pre>
-                        
-                    </li>
-                </ul>
-                
-            </li>
-            <li>Create a virtual environment:
-                <pre><code>python -m venv virtual_environment</code></pre>
-            </li>
-            <li>Activate the virtual environment:
-                <ul>
-                    <li>
-                        <p class="description">Windows:</p>
-                        <pre><code>virtual_environment\Scripts\activate</code></pre>
-                    </li>
-                    <li>
-                        <p class="description">macOS/Linux:</p>
-                        <pre><code>source virtual_environment/bin/activate</code></pre>
-                    </li>
-                </ul>
-            </li>
-            <li>Install Django:
-                <pre><code>pip install Django</code></pre>
-                <pre><code>pip freeze > requirements.txt</code></pre>
-            </li>
-            <li>Create a new Django project:
-                <pre><code>django-admin startproject myproject</code></pre>
-            </li>
-            <li>Navigate into your project:
-                <pre><code>cd myproject</code></pre>
-            </li>
-            <li>Run the development server:
-                <pre><code>python manage.py runserver</code></pre>
-            </li>
-        </ol>
+                    <li class="description">macOS/Linux:</li>
+                    <pre><code>cd '/Users/davidhearl/Documents/08 - Programming/GitHub'</code></pre>
 
-        <h2>2. Link the Project to GitHub</h2>
-        <ol>
-            <li>Initialize a Git repository:
-                <pre><code>git init</code></pre>
+                    <li>Windows:</li>
+                    <pre><code>cd "C:\Users\davidhearl\iCloudDrive\Documents\Programming\GitHub"</code></pre>
+                </ul>
             </li>
-            <li>Create a .gitignore file and add:
+
+            <li>Create the project directiory</li>
+            <pre><code>mkdir myproject</code></pre>
+            <pre><code>cd myproject</code></pre>
+            
+            <li>Create a virtual environment:</li>
+            <pre><code>python -m venv virtual_environment</code></pre>
+            
+            <li>Activate the virtual environment:</li>
+            <ul>
+                <li class="description">Windows:</li>
+                <pre><code>virtual_environment\Scripts\activate</code></pre>
+                
+                <li class="description">macOS/Linux:</li>
+                <pre><code>source virtual_environment/bin/activate</code></pre>
+            </ul>
+            
+            <li>Install Django and save requirements:</li>
+            <pre><code>pip install Django</code></pre>
+            <pre><code>pip freeze > requirements.txt</code></pre>
+    
+            <li>Create a new Django project:</li>
+            <pre><code>django-admin startproject myproject</code></pre>
+            
+            <li>Navigate into your project:</li>
+            <pre><code>cd myproject</code></pre>
+            
+            <li>Run the development server:</li>
+            <pre><code>python manage.py runserver</code></pre>
+        </ol>
+    
+
+        <h2>2. Create a Django App</h2>
+            <ol>
+                <li>Create the app:</li>
+                <pre><code>python manage.py startapp myapp</code></pre>
+                    
+                <li>Open the <code class="filepath">settings.py</code></li>
+
+                <li>Add <code>'myapp'</code> to <code>INSTALLED_APPS</code> in <code>settings.py</code>.</li>
+                <pre class="file-content">
+<code>INSTALLED_APPS = [
+    ...
+    'myapp',
+]</code></pre>
+                
+                <li>Create a superuser:
+                    <pre><code>python manage.py createsuperuser</code></pre>
+                </li>
+            </ol>
+    
+
+        <h2>3. Common Django Settings to Change</h2>
+        <p>Edit <code>myproject/settings.py</code>:</p>
+        <ul>
+            <li>Turn off debug in production:</li>
+            <pre class="file-content"><code>DEBUG = False</code></pre>
+            
+            <li>Set allowed hosts:</li>
+            <pre class="file-content"><code>ALLOWED_HOSTS = ['yourdomain.com', 'localhost']</code></pre>
+            
+            <li>Adjust timezone and language:</li>
+                <pre class="file-content"><code>TIME_ZONE = 'Europe/Dublin'
+LANGUAGE_CODE = 'en-us'</code></pre>
+            
+
+            <li>Use environment variable for secret key:</li>
+                <pre class="file-content"><code>import os
+SECRET_KEY = os.getenv('SECRET_KEY')</code></pre>
+            
+        </ul>
+    
+        <h2>4. Link the Project to GitHub</h2>
+        <ol>
+            <li>Initialize a Git repository:</li>
+            <pre><code>git init</code></pre>
+            
+            <li>Create a <code>.gitignore</code> file in the project root and add:</li>
                 <pre class="file-content"><code>virtual_environment/
 __pycache__/
 *.pyc
 *.sqlite3</code></pre>
-            </li>
-            <li>Add all files:
-                <pre><code>git add .</code></pre>
-            </li>
-            <li>Commit the initial version:
-                <pre><code>git commit -m "Initial commit"</code></pre>
-            </li>
+
+            
+            <li>Add all files:</li>
+            <pre><code>git add .</code></pre>
+            
+            <li>Commit the initial version:</li>
+            <pre><code>git commit -m "Initial commit"</code></pre>
+            
             <li>Create a new repository on GitHub (do not add a README).</li>
-            <li>Link your local repo:
-                <pre><code>git remote add origin https://github.com/davidhearl/your-repo.git</code></pre>
-            </li>
-            <li>Push to GitHub:
-                <pre><code>git branch -M main</code></pre>
-                <pre><code>git push -u origin main</code></pre>
-            </li>
+
+            <li>Link your local repo:</li>
+            <pre><code>git remote add origin https://github.com/davidhearl/your-repo.git</code></pre>
+            
+            <li>Push to GitHub:</li>
+            <pre><code>git branch -M main</code></pre>
+            <pre><code>git push -u origin main</code></pre>
         </ol>
+    
+        <h2>5. Common Django Commands</h2>
+        <pre><code>python manage.py runserver</code></pre>
+        <pre><code>python manage.py makemigrations</code></pre>
+        <pre><code>python manage.py migrate</code></pre>
+        <pre><code>python manage.py startapp appname</code></pre>
+        <pre><code>python manage.py createsuperuser</code></pre>
+        <pre><code>python manage.py shell</code></pre>
+        <pre><code>python manage.py collectstatic</code></pre>
+        <pre><code>python manage.py check</code></pre>
+    </div>
+    
 
-        <h2>3. Common Django Settings to Change</h2>
-        <p>Edit <code class="file-path">myproject/settings.py</code>:</p>
-        <ul>
-            <li>Turn off debug in production:
-                <pre class="file-content"><code>DEBUG = False</code></pre>
-            </li>
-            <li>Set allowed hosts:
-                <pre class="file-content"><code>ALLOWED_HOSTS = ['yourdomain.com', 'localhost']</code></pre>
-            </li>
-            <li>Adjust timezone and language:
-                <pre class="file-content"><code>TIME_ZONE = 'Europe/Dublin'
-LANGUAGE_CODE = 'en-us'</code></pre>
-            </li>
-            <li>Add your app to <code>INSTALLED_APPS</code>:
-                <pre class="file-content"><code>INSTALLED_APPS = [
-    ...
-    'myapp',
-]</code></pre>
-            </li>
-            <li>Use environment variable for secret key:
-                <pre class="file-content"><code>import os
-SECRET_KEY = os.getenv('SECRET_KEY')</code></pre>
-            </li>
-        </ul>
 
-        <h2>4. Commit the Changes</h2>
-        <pre><code>git add .</code></pre>
-        <pre><code>git commit -m "Updated settings and added app"</code></pre>
-        <pre><code>git push</code></pre>
 
-        <h2>5. Create a Django App</h2>
-        <ol>
-            <li>Create the app:
-                <pre><code>python manage.py startapp myapp</code></pre>
-            </li>
-            <li>Add 'myapp' to <code>INSTALLED_APPS</code> in <code>settings.py</code>.</li>
-            <li>Define your models in <code>myapp/models.py</code>.</li>
-            <li>Run migrations:
-                <pre><code>python manage.py makemigrations
-python manage.py migrate</code></pre>
-            </li>
-            <li>Create a superuser:
-                <pre><code>python manage.py createsuperuser</code></pre>
-            </li>
-        </ol>
 
-        <h2>Common Django Commands</h2>
-        <pre><code>python manage.py runserver
-python manage.py makemigrations
-python manage.py migrate
-python manage.py startapp appname
-python manage.py createsuperuser
-python manage.py shell
-python manage.py collectstatic
-python manage.py check</code></pre>
-
+    <div class="container">
         <h2>Deploying a Django Application on Debian</h2>
 
         <h3>1. System Update and Dependencies</h3>
@@ -219,6 +222,7 @@ sudo journalctl -xe</code></pre>
             </li>
         </ul>
     </div>
+
 
     <button id="backToTop" onclick="scrollToTop()">Back to Top</button>
     <script src="script.js"></script>
