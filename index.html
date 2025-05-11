@@ -156,8 +156,59 @@ __pycache__/
             <pre><code>git branch -M main</code></pre>
             <pre><code>git push -u origin main</code></pre>
         </ol>
+
+        <h2>5. Setting up the MVT</h2>
+        <ol>
+            <li>Create the first view in <code>myapp/views.py</code>:</li>
+            <pre class="file-content"><code>from django.shortcuts import render
+        
+def home(request):
+    return render(request, 'myapp/home.html')</code></pre>                
+        
+            <li>Create the app-specific <code>templates/myapp</code> directory and <code>home.html</code>:</li>
+            <pre><code>mkdir -p myapp/templates/myapp</code></pre>
+            <pre><code>touch myapp/templates/myapp/home.html</code></pre>
+        
+            <li>Update <code>settings.py</code> to look for templates in the project root:</li>
+            <pre class="file-content"><code>TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'templates'],
+        ...
+    },
+]</code></pre>
+        
+            <li>Create a static directory and a CSS file for styling:</li>
+            <pre><code>mkdir -p static/css</code></pre>
+            <pre><code>touch static/css/styles.css</code></pre>
+        
+            <li>Make sure <code>settings.py</code> is configured to find static files:</li>
+            <pre class="file-content"><code>STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']</code></pre>
+        
+            <li>Create <code>myapp/urls.py</code> and define the route:</li>
+            <pre><code>touch myapp/urls.py</code></pre>
+            <pre class="file-content"><code>from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.home, name='home'),
+]</code></pre>
+        
+            <li>Include the app URLs in your project-level <code>urls.py</code>:</li>
+            <pre class="file-content"><code>from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('myapp.urls')),
+]</code></pre>
+        </ol>
+        
+
+        
     
-        <h2>5. Common Django Commands</h2>
+        <h2>6. Common Django Commands</h2>
         <pre><code>python manage.py runserver</code></pre>
         <pre><code>python manage.py makemigrations</code></pre>
         <pre><code>python manage.py migrate</code></pre>
