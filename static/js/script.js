@@ -20,8 +20,12 @@ function copyToClipboard(text) {
     });
 }
 
-
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize copy buttons for code blocks
+function initializeCopyButtons() {
+    // Remove existing copy buttons first
+    const existingButtons = document.querySelectorAll('.copy-button');
+    existingButtons.forEach(button => button.remove());
+    
     // Regular code blocks - line by line copy buttons
     const regularCodeBlocks = document.querySelectorAll('pre:not(.file-content) code');
     
@@ -84,4 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         pre.appendChild(copyButton);
     });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCopyButtons();
 });

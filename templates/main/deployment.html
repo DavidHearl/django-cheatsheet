@@ -1,0 +1,189 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Deployment - Django Cheatsheet{% endblock %}
+
+{% block content %}
+<h1>Deployment</h1>
+
+<div class="config-box">
+    <label for="githubUrl">GitHub Repository URL:</label>
+    <input type="text" id="githubUrl" placeholder="https://github.com/username/repository" />
+    <button onclick="updateCommands()">Update Commands</button>
+</div>
+
+<h3>1. System Update and Dependencies</h3>
+<div class="command-group">
+    <p><strong>Update system packages:</strong></p>
+    <pre><code>sudo apt update && sudo apt upgrade -y</code></pre>
+    
+    <p><strong>Install required packages:</strong></p>
+    <pre><code>sudo apt install python3 python3-pip python3-venv git curl build-essential libpq-dev -y</code></pre>
+</div>
+
+<h3>2. Create a Dedicated User (Optional)</h3>
+<div class="command-group">
+    <p><strong>Add django user:</strong></p>
+    <pre><code>sudo adduser django</code></pre>
+    
+    <p><strong>Add user to sudo group:</strong></p>
+    <pre><code>sudo usermod -aG sudo django</code></pre>
+    
+    <p><strong>Switch to django user:</strong></p>
+    <pre><code>su - django</code></pre>
+</div>
+
+<h3>3. Clone Your Django Project</h3>
+<div class="command-group">
+    <p><strong>Clone the repository:</strong></p>
+    <pre><code id="cloneCommand">git clone https://github.com/yourusername/yourproject.git</code></pre>
+    
+    <p><strong>Navigate to project directory:</strong></p>
+    <pre><code id="cdCommand">cd yourproject</code></pre>
+</div>
+
+<h3>4. Set Up Python Virtual Environment</h3>
+<div class="command-group">
+    <p><strong>Create virtual environment:</strong></p>
+    <pre><code>python3 -m venv venv</code></pre>
+    
+    <p><strong>Activate virtual environment:</strong></p>
+    <pre><code>source venv/bin/activate</code></pre>
+    
+    <p><strong>Upgrade pip:</strong></p>
+    <pre><code>pip install --upgrade pip</code></pre>
+    
+    <p><strong>Install project dependencies:</strong></p>
+    <pre><code>pip install -r requirements.txt</code></pre>
+</div>
+
+<h3>5. Configure Django for Production</h3>
+<ul>
+<li>Set <code>DEBUG = False</code></li>
+<li>Set <code>ALLOWED_HOSTS</code> to match your server</li>
+<li>Use a secure <code>SECRET_KEY</code></li>
+</ul>
+<div class="command-group">
+    <p><strong>Collect static files:</strong></p>
+    <pre><code>python manage.py collectstatic</code></pre>
+    
+    <p><strong>Run database migrations:</strong></p>
+    <pre><code>python manage.py migrate</code></pre>
+</div>
+
+<h3>6. Create Gunicorn Systemd Service</h3>
+<div class="command-group">
+    <p><strong>Create the systemd service file:</strong></p>
+    <pre class="file-content"><code>[Unit]
+Description=gunicorn daemon for Django project
+After=network.target
+[Service]
+User=django
+Group=www-data
+WorkingDirectory=/home/django/<span id="projectName1">yourproject</span>
+ExecStart=/home/django/<span id="projectName2">yourproject</span>/venv/bin/gunicorn --workers 3 --bind unix:/home/django/<span id="projectName3">yourproject</span>/gunicorn.sock <span id="projectName4">yourproject</span>.wsgi:application
+[Install]
+WantedBy=multi-user.target</code></pre>
+    
+    <p><strong>Start Gunicorn service:</strong></p>
+    <pre><code>sudo systemctl start gunicorn</code></pre>
+    
+    <p><strong>Enable Gunicorn to start on boot:</strong></p>
+    <pre><code>sudo systemctl enable gunicorn</code></pre>
+</div>
+
+<h3>7. Install and Configure Nginx</h3>
+<div class="command-group">
+    <p><strong>Install Nginx:</strong></p>
+    <pre><code>sudo apt install nginx -y</code></pre>
+    
+    <p><strong>Create Nginx configuration:</strong></p>
+    <pre class="file-content"><code>server {
+    listen 80;
+    server_name your.server.ip.or.domain;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/django/<span id="projectName5">yourproject</span>;
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/django/<span id="projectName6">yourproject</span>/gunicorn.sock;
+    }
+}</code></pre>
+    
+    <p><strong>Create symbolic link to enable site:</strong></p>
+    <pre><code>sudo ln -s /etc/nginx/sites-available/<span id="projectName7">yourproject</span> /etc/nginx/sites-enabled</code></pre>
+    
+    <p><strong>Test Nginx configuration:</strong></p>
+    <pre><code>sudo nginx -t</code></pre>
+    
+    <p><strong>Restart Nginx:</strong></p>
+    <pre><code>sudo systemctl restart nginx</code></pre>
+</div>
+
+<h3>8. Adjust Firewall (If Needed)</h3>
+<pre><code>sudo ufw allow 'Nginx Full'</code></pre>
+
+<h3>9. Set Up HTTPS with Certbot (Optional)</h3>
+<div class="command-group">
+    <p><strong>Install Certbot:</strong></p>
+    <pre><code>sudo apt install certbot python3-certbot-nginx -y</code></pre>
+    
+    <p><strong>Obtain SSL certificate:</strong></p>
+    <pre><code>sudo certbot --nginx -d yourdomain.com</code></pre>
+</div>
+
+<h3>10. Final Checks</h3>
+<ul>
+    <li>Visit your IP or domain</li>
+    <li>Ensure static files, admin panel, and views load</li>
+    <li>Check logs:</li>
+</ul>
+<div class="command-group">
+    <p><strong>Check Gunicorn logs:</strong></p>
+    <pre><code>sudo journalctl -u gunicorn</code></pre>
+    
+    <p><strong>Check system logs:</strong></p>
+    <pre><code>sudo journalctl -xe</code></pre>
+</div>
+
+<script>
+function updateCommands() {
+    const githubUrl = document.getElementById('githubUrl').value.trim();
+    
+    if (!githubUrl) {
+        alert('Please enter a GitHub URL');
+        return;
+    }
+    
+    // Extract project name from GitHub URL
+    // Example: https://github.com/username/repository.git or https://github.com/username/repository
+    const match = githubUrl.match(/github\.com\/[\w-]+\/([\w-]+)(\.git)?$/);
+    
+    if (!match) {
+        alert('Invalid GitHub URL format');
+        return;
+    }
+    
+    const projectName = match[1];
+    
+    // Update clone command
+    const cloneCommand = document.getElementById('cloneCommand');
+    cloneCommand.textContent = `git clone ${githubUrl}`;
+    
+    // Update cd command
+    const cdCommand = document.getElementById('cdCommand');
+    cdCommand.textContent = `cd ${projectName}`;
+    
+    // Update all project name spans
+    for (let i = 1; i <= 7; i++) {
+        const element = document.getElementById(`projectName${i}`);
+        if (element) {
+            element.textContent = projectName;
+        }
+    }
+    
+    // Re-initialize copy buttons for updated commands
+    initializeCopyButtons();
+}
+</script>
+{% endblock %}
